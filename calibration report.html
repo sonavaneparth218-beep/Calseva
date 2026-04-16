@@ -1,0 +1,353 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Instrument Calibration Report - CalSEVA</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap');
+        
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #f3f4f6;
+            color: #1f2937;
+            padding: 20px;
+        }
+
+        .report-container {
+            width: 210mm;
+            min-height: 297mm;
+            margin: 0 auto;
+            background: white;
+            padding: 12mm;
+            box-shadow: 0 0 15px rgba(0,0,0,0.1);
+            position: relative;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 11px;
+            margin-bottom: 8px;
+        }
+
+        th, td {
+            border: 1px solid #94a3b8;
+            padding: 5px 10px;
+            text-align: left;
+        }
+
+        th {
+            background-color: #f8fafc;
+            font-weight: 700;
+            color: #334155;
+        }
+
+        .section-header {
+            background-color: #f1f5f9;
+            font-weight: 700;
+            text-transform: uppercase;
+            font-size: 11.5px;
+            padding: 5px 10px;
+            border: 1px solid #94a3b8;
+            border-bottom: none;
+            color: #1e293b;
+        }
+
+        .no-border-table td {
+            border: none;
+            padding: 3px 5px;
+        }
+
+        /* The Custom Stylish Header inspired by the image */
+        .calseva-header {
+            background-color: #000;
+            color: #fff;
+            padding: 15px 30px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-radius: 4px;
+            margin-bottom: 20px;
+        }
+
+        .header-title {
+            font-size: 24px;
+            font-weight: 800;
+            letter-spacing: -0.5px;
+        }
+
+        .branding-section {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .brand-text-block {
+            text-align: right;
+        }
+
+        .brand-name {
+            font-size: 22px;
+            font-weight: 800;
+            line-height: 1;
+        }
+
+        .brand-tagline {
+            font-size: 10px;
+            font-weight: 400;
+            opacity: 0.9;
+        }
+
+        .logo-circle {
+            width: 48px;
+            height: 48px;
+            background: white;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: black;
+            font-weight: 900;
+            font-size: 28px;
+            position: relative;
+        }
+
+        /* Replicating the 'S' logo style from image */
+        .logo-inner-s {
+            font-family: serif; /* Stylish S */
+            transform: translateY(-1px);
+        }
+
+        @media print {
+            body { background: none; padding: 0; }
+            .report-container { box-shadow: none; margin: 0; width: 100%; padding: 10mm; }
+            .no-print { display: none; }
+            .calseva-header { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="no-print mb-6 flex justify-center gap-4">
+        <button onclick="window.print()" class="bg-black text-white px-8 py-2.5 rounded-lg shadow-lg hover:bg-gray-800 transition font-bold flex items-center gap-2">
+            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 6 2 18 2 18 9"></polyline><path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"></path><rect x="6" y="14" width="12" height="8"></rect></svg>
+            Print Calibration Report
+        </button>
+    </div>
+
+    <div class="report-container">
+        <!-- New Stylish Header Banner -->
+        <div class="calseva-header">
+            <div class="header-title">
+                Instrument Calibration Report
+            </div>
+            <div class="branding-section">
+                <div class="brand-text-block">
+                    <div class="brand-name">CalSEVA</div>
+                    <div class="brand-tagline">Seva with accuracy</div>
+                </div>
+                <div class="logo-circle">
+                    <span class="logo-inner-s">S</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Meta Info Section -->
+        <table class="no-border-table mb-6">
+            <tr>
+                <td width="22%" class="font-bold text-gray-700">Certificate Number</td>
+                <td width="28%">: CS/2026/04/001</td>
+                <td width="22%" class="font-bold text-right text-gray-700">Date of Issue :</td>
+                <td width="28%">10/04/2026</td>
+            </tr>
+            <tr>
+                <td class="font-bold text-gray-700 align-top">Customer Name & Address</td>
+                <td colspan="3" class="leading-relaxed">: <strong>LUPIN LIMITED</strong><br>T-142, M.I.D.C., Tarapur, Via-Boisar, Dist-Palghar - 401506</td>
+            </tr>
+            <tr>
+                <td class="font-bold text-gray-700">Ref. CRF Number</td>
+                <td>: CRF/CAL/2026/012</td>
+                <td class="font-bold text-right text-gray-700">Environmental Conditions :</td>
+                <td>Temp: 23±2°C | Hum: 50±10%RH</td>
+            </tr>
+            <tr>
+                <td class="font-bold text-gray-700">Calibrated at</td>
+                <td>: On-Site (Facility)</td>
+                <td colspan="2"></td>
+            </tr>
+        </table>
+
+        <!-- Details of Unit Under Calibration -->
+        <div class="section-header">Details of the Unit Under Calibration (UUC)</div>
+        <table class="mb-6">
+            <tr>
+                <td width="20%" class="font-semibold bg-gray-50">Description</td>
+                <td width="30%">: CONTROL VALVE</td>
+                <td width="20%" class="font-semibold bg-gray-50">Make/Model No.</td>
+                <td width="30%">: Tecnik / CV-100</td>
+            </tr>
+            <tr>
+                <td class="font-semibold bg-gray-50">Serial / ID Number</td>
+                <td>: TCV-AHU-6107(CHWR)/01</td>
+                <td class="font-semibold bg-gray-50">Operating Range</td>
+                <td>: 0 to 100 %</td>
+            </tr>
+            <tr>
+                <td class="font-semibold bg-gray-50">Resolution</td>
+                <td>: 1%</td>
+                <td class="font-semibold bg-gray-50">Accuracy</td>
+                <td>: ± 2% FS</td>
+            </tr>
+            <tr>
+                <td class="font-semibold bg-gray-50">Location</td>
+                <td>: MPP-3 Area</td>
+                <td class="font-semibold bg-gray-50">Date of Calibration</td>
+                <td>: 09/04/2026</td>
+            </tr>
+            <tr>
+                <td class="font-semibold bg-gray-50">Condition of UUC</td>
+                <td>: OK</td>
+                <td class="font-semibold bg-gray-50">Next Calibration Due</td>
+                <td>: 08/04/2027</td>
+            </tr>
+        </table>
+
+        <!-- Details of Standard Instrument -->
+        <div class="section-header">Reference Standards Used</div>
+        <table class="mb-6">
+            <thead>
+                <tr>
+                    <th class="text-center">Standard Instrument</th>
+                    <th class="text-center">ID / Serial No.</th>
+                    <th class="text-center">Certificate No.</th>
+                    <th class="text-center">Traceability</th>
+                    <th class="text-center">Validity</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr class="text-center">
+                    <td>Universal Process Calibrator</td>
+                    <td>CS-CAL-03/2024</td>
+                    <td>NABL/CERT/9982</td>
+                    <td>ERTL (National Standard)</td>
+                    <td>15/12/2026</td>
+                </tr>
+            </tbody>
+        </table>
+
+        <!-- Calibration Results -->
+        <div class="section-header">Calibration Observations</div>
+        <table class="mb-6">
+            <thead>
+                <tr>
+                    <th class="text-center">Test Point<br><span class="font-normal text-[9px]">(Signal mA)</span></th>
+                    <th class="text-center">Standard Expected<br><span class="font-normal text-[9px]">(Value %)</span></th>
+                    <th class="text-center">UUC Actual Reading<br><span class="font-normal text-[9px]">(Value %)</span></th>
+                    <th class="text-center">Deviation / Error<br><span class="font-normal text-[9px]">(Value %)</span></th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr class="text-center font-medium">
+                    <td>4.00</td>
+                    <td>0.00</td>
+                    <td>0.0</td>
+                    <td>0.0</td>
+                </tr>
+                <tr class="text-center font-medium">
+                    <td>8.00</td>
+                    <td>25.00</td>
+                    <td>25.2</td>
+                    <td>+0.2</td>
+                </tr>
+                <tr class="text-center font-medium">
+                    <td>12.00</td>
+                    <td>50.00</td>
+                    <td>50.0</td>
+                    <td>0.0</td>
+                </tr>
+                <tr class="text-center font-medium">
+                    <td>16.00</td>
+                    <td>75.00</td>
+                    <td>74.8</td>
+                    <td>-0.2</td>
+                </tr>
+                <tr class="text-center font-medium">
+                    <td>20.00</td>
+                    <td>100.00</td>
+                    <td>100.0</td>
+                    <td>0.0</td>
+                </tr>
+            </tbody>
+        </table>
+
+        <!-- Analysis Section -->
+        <div class="grid grid-cols-2 gap-4 mb-8">
+            <div>
+                <div class="section-header">Uncertainty of Measurement</div>
+                <div class="border border-slate-400 p-3 text-[11px] h-16 flex items-center">
+                    The reported expanded uncertainty is ± 0.12% at a confidence level of 95% (k=2).
+                </div>
+            </div>
+            <div>
+                <div class="section-header">Conclusion / Remarks</div>
+                <div class="border border-slate-400 p-3 text-[11px] h-16 flex items-center">
+                    The instrument performance is within acceptable limits. All measurements are traceable to national standards.
+                </div>
+            </div>
+        </div>
+
+        <!-- Footer / Signatories Section -->
+        <div class="mt-auto">
+            <div class="grid grid-cols-3 gap-8 text-center items-end h-32 mb-8">
+                <div class="flex flex-col items-center">
+                    <div class="h-16 w-full flex items-center justify-center">
+                        <!-- Digital Signature Placeholder -->
+                    </div>
+                    <div class="border-t-2 border-gray-300 pt-1 w-full">
+                        <p class="font-bold text-[11px]">CALIBRATED BY</p>
+                        <p class="text-[11px]">Technical Assistant</p>
+                    </div>
+                </div>
+
+                <div class="flex flex-col items-center justify-center">
+                    <!-- Subtle Watermark/Stamp -->
+                    <div class="w-24 h-24 border-2 border-gray-200 rounded-full flex flex-col items-center justify-center text-[7px] text-gray-300 font-bold rotate-12">
+                        <span class="text-center uppercase">CalSEVA<br>AUTHENTICATED</span>
+                        <div class="h-px w-16 bg-gray-200 my-1"></div>
+                        <span>CERTIFIED</span>
+                    </div>
+                </div>
+
+                <div class="flex flex-col items-center">
+                    <div class="h-16 w-full flex items-center justify-center">
+                        <!-- Digital Signature Placeholder -->
+                    </div>
+                    <div class="border-t-2 border-gray-300 pt-1 w-full">
+                        <p class="font-bold text-[11px]">AUTHORIZED SIGNATORY</p>
+                        <p class="text-[11px]">Quality Manager</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="text-[9px] text-gray-400 leading-tight mb-6 text-center italic">
+                This document is electronically generated by CalSEVA. Any unauthorized modification will render the certificate invalid. Information provided relates only to the item(s) calibrated.
+            </div>
+
+            <div class="flex justify-between items-center text-[10px] font-bold text-gray-500 mb-2 px-2">
+                <span>**** END OF REPORT ****</span>
+                <span>Page 1 of 1</span>
+            </div>
+
+            <!-- Modern Footer -->
+            <div class="border-t-2 border-black pt-3 text-center text-[10px] text-gray-600">
+                <p class="font-bold text-black uppercase tracking-widest mb-1">CalSEVA Engineering Solutions</p>
+                <p>Advanced Calibration Lab | HVAC Validation | Clean Room Certification</p>
+                <p class="mt-1"><strong>Support:</strong> support@calseva.app | <strong>Web:</strong> www.calseva.app</p>
+            </div>
+        </div>
+    </div>
+
+</body>
+</html>

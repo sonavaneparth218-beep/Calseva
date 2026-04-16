@@ -1,0 +1,443 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"/>
+    <title>CalSEVA | Professional Billing Terminal</title>
+    
+    <!-- Fonts & Icons -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet"/>
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" />
+    
+    <!-- Scripts -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.23/jspdf.plugin.autotable.min.js"></script>
+    
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: { sans: ['Inter', 'sans-serif'] },
+                    colors: { 
+                        brand: '#000000',
+                        surface: '#F8F9FA'
+                    }
+                }
+            }
+        }
+    </script>
+
+    <style>
+        .no-scrollbar::-webkit-scrollbar { display: none; }
+        input:focus, textarea:focus { border-color: black !important; ring: 0 !important; outline: none !important; }
+        .tab-active { color: black; border-bottom: 3px solid black; }
+        .view-hidden { display: none; }
+        * { border-radius: 0px !important; }
+        
+        @keyframes slideUp {
+            from { transform: translateY(10px); opacity: 0; }
+            to { transform: translateY(0); opacity: 1; }
+        }
+        .animate-in { animation: slideUp 0.3s ease-out forwards; }
+        .btn-press:active { transform: scale(0.96); transition: 0.1s; }
+    </style>
+</head>
+<body class="bg-surface text-black font-sans selection:bg-black selection:text-white overflow-x-hidden">
+
+    <!-- Mobile Header -->
+    <header class="bg-white border-b-2 border-black sticky top-0 z-50 px-6 h-20 flex justify-between items-center shadow-sm">
+        <div class="flex items-center gap-3">
+            <div class="bg-black p-1.5">
+                <a href="Dashboard.html" class="hover:bg-zinc-200 dark:hover:bg-zinc-800 transition-colors active:scale-95 duration-150 p-2 rounded-full">
+                <button class="hover:bg-zinc-200 dark:hover:bg-zinc-800 transition-colors active:scale-95 duration-150 p-2 rounded-full">
+                <span class="material-symbols-outlined text-black dark:text-white" data-icon="arrow_back">arrow_back</span>
+                </button></a>
+            </div>
+            <div>
+                <h1 class="font-black text-xl tracking-tighter uppercase leading-none">CalSEVA</h1>
+                <p class="text-[7px] font-bold tracking-[0.2em] text-gray-500 uppercase">Precision_Unit</p>
+            </div>
+        </div>
+        <div class="flex gap-5 h-full">
+            <button onclick="showView('form')" id="tab-form" class="text-[10px] uppercase tracking-widest font-black text-gray-400 h-full flex items-center tab-active">Terminal</button>
+            <button onclick="showView('vault')" id="tab-vault" class="text-[10px] uppercase tracking-widest font-black text-gray-400 h-full flex items-center">Vault</button>
+        </div>
+    </header>
+
+    <!-- Main Entry Form -->
+    <main id="view-form" class="max-w-2xl mx-auto p-6 py-8 space-y-10 animate-in pb-32">
+        <section class="border-l-8 border-black pl-6">
+            <h2 class="text-4xl font-black uppercase leading-[0.9] tracking-tighter italic">Calibration<br>Assistant<br>Terminal</h2>
+            <p class="text-[9px] font-bold text-gray-400 uppercase tracking-widest mt-4 flex items-center gap-2">
+                <span class="w-2 h-2 bg-green-500 animate-pulse"></span> SYSTEM_READY // INPUT_STREAM
+            </p>
+        </section>
+
+        <form id="billingForm" class="grid grid-cols-1 gap-8">
+            <div class="space-y-2">
+                <label class="text-[9px] font-black uppercase tracking-[0.3em] text-gray-500">01. Customer Name</label>
+                <input id="customerName" type="text" class="w-full border-2 border-black p-4 text-md font-bold bg-white uppercase" placeholder="NAME OF RECIPIENT">
+            </div>
+
+            <div class="space-y-2">
+                <label class="text-[9px] font-black uppercase tracking-[0.3em] text-gray-500">02. Service Detail (^SERVICE)</label>
+                <textarea id="serviceDetail" rows="5" class="w-full border-2 border-black p-4 text-sm font-medium bg-white resize-none" placeholder="1. CALIBRATION OF SENSOR&#10;2. CALIBRATION OF MACHINE..."></textarea>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div class="space-y-2">
+                    <label class="text-[9px] font-black uppercase tracking-[0.3em] text-gray-500">03. Working Load</label>
+                    <input id="workingLoad" type="text" class="w-full border-2 border-black p-4 text-md font-bold bg-white uppercase" placeholder="E.G. 25">
+                </div>
+                <div class="space-y-2">
+                    <label class="text-[9px] font-black uppercase tracking-[0.3em] text-gray-500">04. Net Charges (₹)</label>
+                    <input id="netCharges" type="number" step="0.01" class="w-full border-2 border-black p-4 text-xl font-black bg-white" placeholder="0.00">
+                </div>
+            </div>
+
+            <div class="space-y-2">
+                <label class="text-[9px] font-black uppercase tracking-[0.3em] text-gray-500">05. Current Date</label>
+                <input id="billDate" type="date" class="w-full border-2 border-black p-4 text-md font-bold bg-white">
+            </div>
+
+            <div class="pt-6">
+                <button type="button" onclick="commitEntry()" class="btn-press w-full bg-black text-white py-5 font-black uppercase tracking-[0.3em] text-md flex items-center justify-center gap-4 shadow-[6px_6px_0px_rgba(0,0,0,0.1)]">
+                    Generate Log Record
+                    <span class="material-symbols-outlined">description</span>
+                </button>
+            </div>
+        </form>
+    </main>
+
+    <!-- Records Vault -->
+    <main id="view-vault" class="max-w-2xl mx-auto p-6 py-8 view-hidden animate-in pb-32">
+        <!-- Analytics Header -->
+        <div class="grid grid-cols-2 gap-4 mb-8">
+            <div class="bg-black text-white p-4">
+                <p class="text-[8px] uppercase tracking-widest font-bold opacity-50">Total Ledger Value</p>
+                <h3 id="statRevenue" class="text-xl font-black mt-1">₹ 0.00</h3>
+            </div>
+            <div class="bg-white border-2 border-black p-4">
+                <p class="text-[8px] uppercase tracking-widest font-bold text-gray-400">Archived Records</p>
+                <h3 id="statCount" class="text-xl font-black mt-1">0</h3>
+            </div>
+        </div>
+
+        <div class="mb-6 space-y-4">
+            <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 border-b-4 border-black pb-4">
+                <h2 class="text-3xl font-black uppercase tracking-tighter italic">Ledger_Vault</h2>
+                <div class="flex gap-2 w-full md:w-auto">
+                    <button onclick="exportCSV()" class="flex-1 bg-white border border-black text-[9px] font-black uppercase p-2 px-3 flex items-center gap-2 hover:bg-gray-100">
+                        <span class="material-symbols-outlined text-xs">database</span> Export CSV
+                    </button>
+                    <select id="vaultSort" onchange="renderVault()" class="bg-black text-white text-[9px] font-black uppercase p-2 px-3 outline-none">
+                        <option value="new">Date: Newest</option>
+                        <option value="old">Date: Oldest</option>
+                        <option value="high">Value: High</option>
+                    </select>
+                </div>
+            </div>
+            
+            <div class="relative">
+                <span class="material-symbols-outlined absolute left-4 top-1/2 -translate-y-1/2 text-gray-400 text-sm">search</span>
+                <input id="vaultSearch" type="text" oninput="renderVault()" class="w-full border-2 border-black p-3 pl-10 text-xs font-bold uppercase placeholder:text-gray-300" placeholder="Search customer or bill ID...">
+            </div>
+        </div>
+
+        <div id="vaultList" class="space-y-4">
+            <!-- Dynamic Content -->
+        </div>
+
+        <div id="emptyState" class="py-32 text-center opacity-10">
+            <span class="material-symbols-outlined text-8xl">inventory_2</span>
+            <p class="text-xs font-black uppercase tracking-[0.5em] mt-6">Vault is Empty</p>
+        </div>
+    </main>
+
+    <!-- Mobile Navigation Bar -->
+    <nav class="fixed bottom-0 left-0 w-full h-18 bg-white border-t-2 border-black flex z-[100] pb-safe">
+        <button onclick="showView('form')" class="flex-1 flex flex-col items-center justify-center gap-1 active:bg-gray-50 border-r-2 border-black transition-colors">
+            <span class="material-symbols-outlined text-2xl">edit_document</span>
+            <span class="text-[9px] font-black uppercase tracking-tighter">New Bill</span>
+        </button>
+        <button onclick="showView('vault')" class="flex-1 flex flex-col items-center justify-center gap-1 active:bg-gray-50 transition-colors">
+            <span class="material-symbols-outlined text-2xl">account_balance_wallet</span>
+            <span class="text-[9px] font-black uppercase tracking-tighter">Vault Ledger</span>
+        </button>
+    </nav>
+
+    <script>
+        const DB_KEY = 'calseva_vault_final_v3';
+        let db = [];
+
+        function initDB() {
+            try {
+                const stored = localStorage.getItem(DB_KEY);
+                db = stored ? JSON.parse(stored) : [];
+            } catch (e) {
+                db = [];
+            }
+        }
+
+        const ASSETS = {
+            signature: "https://i.supaimg.com/d0495ff2-7a2f-426d-a287-7b3b2861a5ee/b6c07286-712a-45cc-b9cd-f44051e8355a.jpg",
+            logo: "https://i.supaimg.com/d0495ff2-7a2f-426d-a287-7b3b2861a5ee/2c62bf77-c549-4cfa-8c92-08a97bdef21b.jpg"
+        };
+
+        function showView(view) {
+            document.getElementById('view-form').classList.toggle('view-hidden', view !== 'form');
+            document.getElementById('view-vault').classList.toggle('view-hidden', view !== 'vault');
+            document.getElementById('tab-form').classList.toggle('tab-active', view === 'form');
+            document.getElementById('tab-vault').classList.toggle('tab-active', view === 'vault');
+            if(view === 'vault') renderVault();
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+
+        function setDefaultDate() {
+            const today = new Date().toISOString().split('T')[0];
+            document.getElementById('billDate').value = today;
+        }
+
+        function commitEntry() {
+            const name = document.getElementById('customerName').value.trim();
+            const detail = document.getElementById('serviceDetail').value.trim();
+            const load = document.getElementById('workingLoad').value.trim();
+            const charges = document.getElementById('netCharges').value.trim();
+            const date = document.getElementById('billDate').value;
+
+            if(!name || !charges) return alert("ERROR: Customer Name and Charges are required.");
+
+            const entry = {
+                id: `CS-${Date.now().toString().slice(-6)}`,
+                customer: name,
+                service: detail || "General Calibration Assistance",
+                load: load || "N/A",
+                amount: parseFloat(charges),
+                date: date,
+                ts: Date.now()
+            };
+
+            db.unshift(entry);
+            localStorage.setItem(DB_KEY, JSON.stringify(db));
+            generatePDF(entry);
+            document.getElementById('billingForm').reset();
+            setDefaultDate();
+            showView('vault');
+        }
+
+        function renderVault() {
+            initDB();
+            const list = document.getElementById('vaultList');
+            const empty = document.getElementById('emptyState');
+            const sort = document.getElementById('vaultSort').value;
+            const query = document.getElementById('vaultSearch').value.toLowerCase();
+            
+            let filtered = db.filter(i => i.customer.toLowerCase().includes(query) || i.id.toLowerCase().includes(query));
+
+            if(sort === 'old') filtered.sort((a,b) => a.ts - b.ts);
+            if(sort === 'high') filtered.sort((a,b) => b.amount - a.amount);
+            if(sort === 'new') filtered.sort((a,b) => b.ts - a.ts);
+
+            const totalRev = db.reduce((sum, item) => sum + item.amount, 0);
+            document.getElementById('statRevenue').innerText = `₹ ${totalRev.toLocaleString('en-IN', {minimumFractionDigits: 2})}`;
+            document.getElementById('statCount').innerText = db.length;
+
+            if(db.length === 0) {
+                list.innerHTML = "";
+                empty.style.display = "block";
+                return;
+            }
+
+            empty.style.display = "none";
+            list.innerHTML = filtered.map(item => `
+                <div class="bg-white border-2 border-black p-5 flex justify-between items-center shadow-[4px_4px_0px_rgba(0,0,0,1)] group">
+                    <div class="overflow-hidden mr-4">
+                        <div class="flex items-center gap-2 mb-1">
+                            <span class="text-[8px] font-black bg-black text-white px-2 py-0.5 tracking-tighter italic">${item.id}</span>
+                            <span class="text-[8px] font-bold text-gray-400 uppercase tracking-widest">${item.date}</span>
+                        </div>
+                        <h4 class="font-black text-sm uppercase truncate max-w-[200px] leading-none mt-1">${item.customer}</h4>
+                        <p class="text-xl font-black mt-2">₹ ${item.amount.toLocaleString('en-IN')}</p>
+                    </div>
+                    <div class="flex gap-2">
+                        <button onclick="downloadPDF('${item.id}')" class="w-12 h-12 bg-black text-white flex items-center justify-center">
+                            <span class="material-symbols-outlined text-sm">download</span>
+                        </button>
+                        <button onclick="deleteEntry('${item.id}')" class="w-12 h-12 border-2 border-black flex items-center justify-center hover:text-red-600">
+                            <span class="material-symbols-outlined text-sm">delete</span>
+                        </button>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        function downloadPDF(id) {
+            const item = db.find(i => i.id === id);
+            if(item) generatePDF(item);
+        }
+
+        function deleteEntry(id) {
+            if(confirm("Expunge record from ledger permanently?")) {
+                db = db.filter(i => i.id !== id);
+                localStorage.setItem(DB_KEY, JSON.stringify(db));
+                renderVault();
+            }
+        }
+
+        function exportCSV() {
+            if(db.length === 0) return alert("No data to export.");
+            const rows = [["Bill ID", "Date", "Customer", "Service", "Load", "Amount"]];
+            db.forEach(i => rows.push([i.id, i.date, i.customer, i.service.replace(/\n/g, ' '), i.load, i.amount]));
+            const csvContent = "data:text/csv;charset=utf-8," + rows.map(e => e.join(",")).join("\n");
+            const link = document.createElement("a");
+            link.setAttribute("href", encodeURI(csvContent));
+            link.setAttribute("download", "CalSEVA_Ledger_Export.csv");
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+        }
+
+        /**
+         * UPDATED PDF GENERATOR - Matches image_c9aa5f.png precisely
+         */
+        async function generatePDF(data) {
+            const { jsPDF } = window.jspdf;
+            const doc = new jsPDF({ unit: 'mm', format: 'a4' });
+            const pageWidth = 210;
+            const pageHeight = 297;
+            const leftMargin = 10;
+            const rightMargin = 10;
+            const contentWidth = pageWidth - leftMargin - rightMargin; // 190mm
+
+            // 1. TOP HEADER BAR
+            doc.setFillColor(0, 0, 0);
+            doc.rect(leftMargin, 10, contentWidth, 9, 'F');
+
+            // "Calibration Assistant Charges" centered
+            doc.setTextColor(255, 255, 255);
+            doc.setFontSize(12);
+            doc.setFont("helvetica", "bold");
+            doc.text("Calibration Assistant Charges", 105, 15.8, { align: 'center' });
+
+            // Branding on right
+            doc.setFontSize(9);
+            doc.setFont("helvetica", "bold");
+            doc.text("CalSEVA", 186, 13.5, { align: 'right' });
+            doc.setFontSize(6);
+            doc.setFont("helvetica", "normal");
+            doc.text("Seva with accuracy", 186, 17, { align: 'right' });
+
+            // Circle Logo top right
+            const circleX = 196; 
+            const circleY = 14.5; 
+            const circleR = 5;
+            doc.setFillColor(255, 255, 255);
+            doc.circle(circleX, circleY, circleR, 'F');
+            try {
+                doc.addImage(ASSETS.logo, 'JPEG', circleX - circleR + 0.5, circleY - circleR + 0.5, (circleR * 2) - 1, (circleR * 2) - 1);
+            } catch(e) {}
+
+            // 2. MAIN DATA TABLE (6 rows as per newest layout)
+            doc.autoTable({
+                startY: 22,
+                margin: { left: leftMargin, right: rightMargin },
+                theme: 'grid',
+                styles: { 
+                    lineColor: [0, 0, 0], 
+                    lineWidth: 0.3, 
+                    textColor: [0, 0, 0], 
+                    fontSize: 10, 
+                    cellPadding: { top: 5, bottom: 5, left: 4, right: 4 }, 
+                    font: 'helvetica',
+                    valign: 'middle'
+                },
+                columnStyles: { 
+                    0: { cellWidth: 52, fontStyle: 'bold', halign: 'left' }, 
+                    1: { halign: 'left' } 
+                },
+                body: [
+                    ["Current date", data.date],
+                    ["Bill ID", data.id],
+                    ["Customer name", data.customer.toUpperCase()],
+                    [{ content: "^Service", styles: { minCellHeight: 25 } }, data.service.toUpperCase()],
+                    ["Working load", data.load.toUpperCase()],
+                    ["*Net charges", `Rs. ${data.amount.toLocaleString('en-IN', {minimumFractionDigits: 2})}`]
+                ]
+            });
+
+            // 3. MIDDLE SECTION (Stacked Boxes)
+            let y = doc.lastAutoTable.finalY + 4;
+            doc.setDrawColor(0, 0, 0); 
+            doc.setLineWidth(0.3);
+            
+            // Box 1: Quality Statement
+            const qBoxH = 24;
+            doc.rect(leftMargin, y, contentWidth, qBoxH);
+            doc.setFontSize(6.5); doc.setFont("helvetica", "bold"); doc.setTextColor(150, 150, 150);
+            doc.text("^ Service Quality Statement", leftMargin + 3, y + 4);
+            doc.setFont("helvetica", "normal"); doc.setTextColor(0, 0, 0); doc.setFontSize(7);
+            const qualityLines = [
+                "We ensure that all calibration assistance work is carried out with proper care, accuracy, and attention to detail.",
+                "All services are performed using standard procedures and practical knowledge.",
+                "We aim to deliver reliable and consistent support during calibration tasks.",
+                "The work provided is genuine and completed to the best of our capability."
+            ];
+            doc.text(qualityLines, leftMargin + 3, y + 8, { maxWidth: contentWidth - 6, lineHeightFactor: 1.4 });
+
+            y += qBoxH;
+
+            // Box 2: Declaration
+            const dBoxH = 32;
+            doc.rect(leftMargin, y, contentWidth, dBoxH);
+            doc.setFontSize(6.5); doc.setFont("helvetica", "bold"); doc.setTextColor(150, 150, 150);
+            doc.text("* Declaration (GST Not Applicable) – Calibration Assistant Services", leftMargin + 3, y + 4);
+            doc.setFont("helvetica", "normal"); doc.setTextColor(0, 0, 0); doc.setFontSize(7);
+            const declLines = [
+                "Key Points (5 points):",
+                "1. This service is provided by an individual calibration assistant and not a registered business entity.",
+                "2. The total annual income is below the GST threshold limit (Rs. 20 lakh), hence GST registration is not applicable.",
+                "3. As per current GST rules, no GST is charged or included in this bill.",
+                "4. The charges mentioned are pure service/labour charges only, without any tax component.",
+                "5. This is a basic support/assistance service, and no formal GST invoice is issued."
+            ];
+            doc.text(declLines, leftMargin + 3, y + 9, { maxWidth: contentWidth - 6, lineHeightFactor: 1.4 });
+
+            y += dBoxH;
+
+            // Box 3: Signature Box
+            const sigBoxH = 26;
+            doc.rect(leftMargin, y, contentWidth, sigBoxH);
+            try { 
+                const sigW = 40;
+                const sigH = 20;
+                doc.addImage(ASSETS.signature, 'JPEG', leftMargin + contentWidth - sigW - 5, y + 3, sigW, sigH); 
+            } catch(e) {}
+
+            y += sigBoxH;
+
+            // 4. BOTTOM LOGO SECTION (CLEAN CENTERED ON WHITE)
+            const footerBarY = pageHeight - 15;
+            const logoSectionCenterY = y + (footerBarY - y) / 2;
+            const logoSize = 50; // Large center logo size
+            
+            try {
+                // Centered circular logo above the black footer
+                doc.addImage(ASSETS.logo, 'JPEG', (pageWidth / 2) - (logoSize / 2), logoSectionCenterY - (logoSize / 2), logoSize, logoSize);
+            } catch(e) {}
+
+            // 5. FINAL FOOTER BAR
+            doc.setFillColor(0, 0, 0);
+            doc.rect(leftMargin, footerBarY, contentWidth, 9, 'F');
+            doc.setTextColor(255, 255, 255);
+            doc.setFontSize(12);
+            doc.setFont("helvetica", "bold");
+            doc.text("SEVA WITH ACCURACY", pageWidth / 2, footerBarY + 6, { align: 'center' });
+
+            doc.save(`${data.id}_CalSEVA_Log.pdf`);
+        }
+
+        window.onload = () => { initDB(); setDefaultDate(); renderVault(); };
+    </script>
+</body>
+</html>

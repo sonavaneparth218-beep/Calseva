@@ -1,0 +1,183 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Calibration Assistant Charges - CalSEVA</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;700;800&display=swap');
+        
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #f3f4f6;
+            padding: 2rem 0;
+        }
+
+        .paper {
+            background: white;
+            width: 210mm;
+            min-height: 297mm;
+            margin: 0 auto;
+            padding: 0;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+            position: relative;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .header-black {
+            background-color: black;
+            color: white;
+            padding: 15px 30px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .content-area {
+            padding: 40px;
+            flex-grow: 1;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 30px;
+        }
+
+        th, td {
+            border: 1.5px solid #333;
+            padding: 12px 20px;
+            text-align: left;
+        }
+
+        .label-cell {
+            width: 45%;
+            font-weight: 800;
+            text-transform: uppercase;
+            text-align: center;
+        }
+
+        .service-row {
+            height: 400px;
+        }
+
+        .declaration-box {
+            border: 1px solid #999;
+            padding: 15px;
+            margin-top: 30px;
+            font-size: 0.85rem;
+            line-height: 1.4;
+            color: #444;
+        }
+
+        .footer-black {
+            background-color: black;
+            color: white;
+            padding: 10px;
+            text-align: center;
+            font-weight: 800;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+            margin-top: auto;
+        }
+
+        @media print {
+            body { background: none; padding: 0; }
+            .paper { box-shadow: none; margin: 0; width: 100%; }
+            .no-print { display: none; }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="no-print flex justify-center mb-6">
+        <button onclick="window.print()" class="bg-black text-white px-6 py-2 rounded-full font-bold hover:bg-gray-800 transition shadow-lg">
+            Print / Save as PDF
+        </button>
+    </div>
+
+    <div class="paper">
+        <!-- Header -->
+        <header class="header-black">
+            <h1 class="text-2xl font-extrabold tracking-tight">Calibration Assistant Charges</h1>
+            <div class="flex items-center gap-3">
+                <div class="text-right">
+                    <div class="text-lg font-bold leading-none">CalSEVA</div>
+                    <div class="text-[10px] uppercase font-medium">Seva with accuracy</div>
+                </div>
+                <img src="https://i.supaimg.com/d0495ff2-7a2f-426d-a287-7b3b2861a5ee/2c62bf77-c549-4cfa-8c92-08a97bdef21b.jpg" 
+                     alt="CalSEVA Logo" 
+                     class="h-10 w-10 object-contain"
+                     onerror="this.style.display='none'">
+            </div>
+        </header>
+
+        <!-- Bill Details -->
+        <div class="content-area">
+            <div class="space-y-1">
+                <div class="font-extrabold text-lg">CURRENT DATE</div>
+                <div class="font-extrabold text-lg flex items-center">BILL ID : <span class="ml-2 border-b border-black w-32 inline-block"></span></div>
+            </div>
+
+            <!-- Main Table -->
+            <table>
+                <tr>
+                    <td class="label-cell">CUSTOMER NAME</td>
+                    <td></td>
+                </tr>
+                <tr class="service-row">
+                    <td class="label-cell align-middle">^SERVICE</td>
+                    <td></td>
+                </tr>
+                <tr>
+                    <td class="label-cell">WORKING LOAD</td>
+                    <td></td>
+                </tr>
+                <tr>
+                    <td class="label-cell">*NET CHARGES</td>
+                    <td></td>
+                </tr>
+            </table>
+
+            <!-- Statements & Declarations -->
+            <div class="declaration-box">
+                <div class="mb-4">
+                    <h3 class="font-bold text-gray-600 mb-1">^ Service Quality Statement</h3>
+                    <p>We ensure that all calibration assistance work is carried out with proper care, accuracy, and attention to detail.</p>
+                    <p>All services are performed using standard procedures and practical knowledge.</p>
+                    <p>We aim to deliver reliable and consistent support during calibration tasks.</p>
+                    <p>The work provided is genuine and completed to the best of our capability.</p>
+                </div>
+
+                <div class="border-t border-gray-300 pt-4 relative">
+                    <h3 class="font-bold text-gray-600 mb-1">* Declaration (GST Not Applicable) – Calibration Assistant Services</h3>
+                    <p class="font-semibold mb-1 italic">Key Points (5 points):</p>
+                    <ol class="list-decimal ml-5 space-y-0.5 text-gray-700">
+                        <li>This service is provided by an individual calibration assistant and not a registered business entity.</li>
+                        <li>The total annual income is below the GST threshold limit (₹20 lakh), hence GST registration is not applicable.</li>
+                        <li>As per current GST rules, no GST is charged or included in this bill.</li>
+                        <li>The charges mentioned are pure service/labour charges only, without any tax component.</li>
+                        <li>This is a basic support/assistance service, and no formal GST invoice is issued.</li>
+                    </ol>
+
+                    <!-- Signature -->
+                    <div class="absolute right-4 bottom-[-10px] text-center">
+                        <img src="https://i.supaimg.com/d0495ff2-7a2f-426d-a287-7b3b2861a5ee/b6c07286-712a-45cc-b9cd-f44051e8355a.jpg" 
+                             alt="Signature" 
+                             class="h-24 w-auto object-contain mx-auto"
+                             onerror="this.style.opacity=0">
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Footer -->
+        <footer class="footer-black">
+            SEVA WITH ACCURACY
+        </footer>
+    </div>
+
+</body>
+</html>

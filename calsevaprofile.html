@@ -1,0 +1,299 @@
+<!DOCTYPE html>
+<html class="light" lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" name="viewport">
+    <title>Account Management | Calseva</title>
+    <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+    <link href="https://fonts.googleapis.com/css2?family=League+Spartan:wght@700;800;900&family=Montserrat:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet">
+    <script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        "primary": "#000000",
+                        "on-primary": "#ffffff",
+                        "surface": "#f9f9f9",
+                        "surface-container": "#f3f3f3",
+                        "outline": "#777777",
+                        "accent": "#ba1a1a"
+                    },
+                    fontFamily: {
+                        "headline": ["League Spartan", "sans-serif"],
+                        "body": ["Montserrat", "sans-serif"]
+                    }
+                },
+            },
+        }
+    </script>
+    <style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+        body { font-family: 'Montserrat', sans-serif; }
+        h1, h2, h3 { font-family: 'League Spartan', sans-serif; }
+        
+        /* Smooth Round Toggle Switch */
+        .ind-switch {
+            width: 44px;
+            height: 22px;
+            background: #cbd5e1; /* Neutral slate-200 */
+            border-radius: 9999px;
+            padding: 2px;
+            cursor: pointer;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            position: relative;
+            display: flex;
+            align-items: center;
+        }
+        .ind-switch.active { background: #000000; }
+        .ind-handle {
+            width: 18px;
+            height: 18px;
+            background: #ffffff;
+            border-radius: 9999px;
+            transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+        }
+        .active .ind-handle { transform: translateX(22px); }
+
+        /* Dark Mode Toggle Visual */
+        .dark .ind-switch { background: #334155; }
+        .dark .ind-switch.active { background: #ffffff; }
+        .dark .ind-switch.active .ind-handle { background: #0f172a; }
+
+        /* Sustainable Dark Mode Transition */
+        body { transition: background-color 0.4s ease, color 0.4s ease; }
+        .dark body { background-color: #0f172a; color: #f1f5f9; }
+        .dark header { background-color: #1e293b; border-bottom-color: rgba(255,255,255,0.05); }
+        .dark .bg-slate-100 { background-color: #1e293b; }
+        .dark .bg-white { background-color: #1e293b; border-color: rgba(255,255,255,0.05); }
+        .dark .bg-black\/5 { background-color: rgba(255,255,255,0.05); }
+        .dark .border-black { border-color: #f1f5f9; }
+        .dark .text-black { color: #ffffff; }
+        .dark nav { background-color: #0f172a; border-top-color: #334155; }
+        
+        .animate-slide-up { animation: slideUp 0.4s ease-out; }
+        @keyframes slideUp { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+    </style>
+</head>
+<body class="bg-surface text-primary min-h-screen pb-24">
+
+    <!-- Top App Bar -->
+    <header class="sticky top-0 z-50 bg-white border-b border-black/5 px-6 py-4 flex justify-between items-center">
+        <div class="flex items-center gap-4">
+            <button onclick="history.back()" class="hover:opacity-60 transition-opacity">
+                <span class="material-symbols-outlined text-inherit">arrow_back</span>
+            </button>
+            <h1 class="font-headline font-black tracking-tighter uppercase text-xl text-inherit">ACCOUNT_MGMT</h1>
+        </div>
+        <button class="hover:rotate-90 transition-transform duration-500 text-inherit">
+            <span class="material-symbols-outlined">settings</span>
+        </button>
+    </header>
+
+    <main class="max-w-xl mx-auto px-6 pt-10 space-y-12">
+        
+        <!-- Profile Branding -->
+        <section class="flex flex-col items-center text-center space-y-6">
+            <div class="relative">
+                <div class="w-32 h-32 border-2 border-black dark:border-white bg-white overflow-hidden p-1">
+                    <img id="profileImage" alt="Alexander Vance" class="w-full h-full object-cover grayscale" src="https://i.supaimg.com/d0495ff2-7a2f-426d-a287-7b3b2861a5ee/d6f0bc69-81ec-4405-a4fa-80ccd310b717.jpg">
+                </div>
+                <label for="imgUpload" class="absolute bottom-0 right-0 bg-black text-white dark:bg-white dark:text-black p-2 cursor-pointer hover:scale-110 transition-transform active:scale-95 shadow-lg">
+                    <span class="material-symbols-outlined text-sm">edit</span>
+                    <input type="file" id="imgUpload" class="hidden" accept="image/*" onchange="previewImage(event)">
+                </label>
+            </div>
+            
+            <div class="space-y-2">
+                <h2 class="text-4xl font-black tracking-tight uppercase leading-none" id="display-name">Alexander Vance</h2>
+                <div class="flex flex-col items-center gap-2">
+                    <span class="bg-black text-white dark:bg-white dark:text-black px-4 py-1 text-[10px] font-bold tracking-widest uppercase">Lead Technician</span>
+                    <p class="text-[11px] font-bold tracking-wider text-outline uppercase">ID: CS-00829 • <span id="display-email">a.vance@calseva.tech</span></p>
+                </div>
+            </div>
+        </section>
+
+        <!-- Personal Information Section -->
+        <section class="space-y-6">
+            <div class="flex justify-between items-end border-b-2 border-black dark:border-white pb-2">
+                <h3 class="text-2xl font-black tracking-tight uppercase">Personal Info</h3>
+                <button onclick="toggleEditMode()" id="edit-btn" class="font-bold text-xs tracking-widest uppercase hover:underline opacity-70">Edit</button>
+            </div>
+
+            <div id="info-view" class="grid grid-cols-1 gap-y-4">
+                <div class="bg-slate-100 dark:bg-slate-800/50 p-4 border border-black/5">
+                    <span class="block text-[10px] font-bold text-outline uppercase tracking-[0.2em] mb-1">Legal Name</span>
+                    <p class="font-bold text-sm uppercase" id="val-name">Alexander Vance</p>
+                </div>
+                <div class="bg-slate-100 dark:bg-slate-800/50 p-4 border border-black/5">
+                    <span class="block text-[10px] font-bold text-outline uppercase tracking-[0.2em] mb-1">Email Terminal</span>
+                    <p class="font-bold text-sm" id="val-email">a.vance@calseva.tech</p>
+                </div>
+                <div class="grid grid-cols-2 gap-4">
+                    <div class="bg-slate-100 dark:bg-slate-800/50 p-4 border border-black/5">
+                        <span class="block text-[10px] font-bold text-outline uppercase tracking-[0.2em] mb-1">Phone</span>
+                        <p class="font-bold text-sm" id="val-phone">+1 (555) 092-8831</p>
+                    </div>
+                    <div class="bg-slate-100 dark:bg-slate-800/50 p-4 border border-black/5">
+                        <span class="block text-[10px] font-bold text-outline uppercase tracking-[0.2em] mb-1">Division</span>
+                        <p class="font-bold text-sm uppercase" id="val-dept">Calibration</p>
+                    </div>
+                </div>
+            </div>
+
+            <form id="info-form" class="hidden grid grid-cols-1 gap-y-4 animate-slide-up">
+                <input type="text" id="input-name" class="w-full bg-white dark:bg-slate-900 border-2 border-black dark:border-white p-4 text-sm font-bold uppercase focus:ring-0">
+                <input type="email" id="input-email" class="w-full bg-white dark:bg-slate-900 border-2 border-black dark:border-white p-4 text-sm font-bold focus:ring-0">
+                <div class="grid grid-cols-2 gap-4">
+                    <input type="text" id="input-phone" class="w-full bg-white dark:bg-slate-900 border-2 border-black dark:border-white p-4 text-sm font-bold focus:ring-0">
+                    <input type="text" id="input-dept" class="w-full bg-white dark:bg-slate-900 border-2 border-black dark:border-white p-4 text-sm font-bold uppercase focus:ring-0">
+                </div>
+                <button type="button" onclick="saveProfile()" class="w-full bg-black dark:bg-white text-white dark:text-black py-4 font-black uppercase tracking-widest text-xs">Synchronize Changes</button>
+            </form>
+        </section>
+
+        <!-- Role & Access -->
+        <section class="space-y-6">
+            <h3 class="text-2xl font-black tracking-tight uppercase border-b-2 border-black dark:border-white pb-2">Role & Access</h3>
+            <div class="bg-black/5 dark:bg-white/5 p-6 space-y-4 border-l-4 border-black dark:border-white">
+                <div>
+                    <span class="block text-[10px] font-bold text-outline uppercase tracking-[0.2em] mb-1">Auth Level</span>
+                    <p class="text-lg font-black uppercase tracking-tighter">Lead Technician (Tier 2)</p>
+                </div>
+                <div class="space-y-3 pt-4 border-t border-black/10 dark:border-white/10">
+                    <div class="flex items-center gap-3">
+                        <span class="material-symbols-outlined text-inherit text-sm fill-1" style="font-variation-settings: 'FILL' 1">check_circle</span>
+                        <span class="text-[11px] font-bold uppercase">Calibration Record Access</span>
+                    </div>
+                    <div class="flex items-center gap-3">
+                        <span class="material-symbols-outlined text-inherit text-sm fill-1" style="font-variation-settings: 'FILL' 1">check_circle</span>
+                        <span class="text-[11px] font-bold uppercase">Export System Logs</span>
+                    </div>
+                    <div class="flex items-center gap-3">
+                        <span class="material-symbols-outlined text-inherit text-sm fill-1" style="font-variation-settings: 'FILL' 1">check_circle</span>
+                        <span class="text-[11px] font-bold uppercase">Heavy Equipment Override</span>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Security & Preferences (Interactive Toggles) -->
+        <section class="space-y-6">
+            <h3 class="text-2xl font-black tracking-tight uppercase border-b-2 border-black dark:border-white pb-2">Control</h3>
+            <div class="space-y-px bg-black/10 dark:bg-white/10">
+                <!-- 2FA Toggle -->
+                <div class="flex justify-between items-center bg-white dark:bg-slate-800 p-5">
+                    <div class="flex items-center gap-4">
+                        <span class="material-symbols-outlined text-inherit">verified_user</span>
+                        <span class="font-bold text-xs uppercase tracking-widest">Two-Factor Auth</span>
+                    </div>
+                    <div class="ind-switch active" onclick="toggleSwitch(this)">
+                        <div class="ind-handle"></div>
+                    </div>
+                </div>
+                <!-- Dark Mode Toggle -->
+                <div class="flex justify-between items-center bg-white dark:bg-slate-800 p-5">
+                    <div class="flex items-center gap-4">
+                        <span class="material-symbols-outlined text-inherit">dark_mode</span>
+                        <span class="font-bold text-xs uppercase tracking-widest">Dark Protocol</span>
+                    </div>
+                    <div class="ind-switch" id="darkModeSwitch" onclick="toggleSwitch(this, true)">
+                        <div class="ind-handle"></div>
+                    </div>
+                </div>
+                <!-- Notifications -->
+                <div class="flex justify-between items-center bg-white dark:bg-slate-800 p-5">
+                    <div class="flex items-center gap-4">
+                        <span class="material-symbols-outlined text-inherit">notifications</span>
+                        <span class="font-bold text-xs uppercase tracking-widest">System Alerts</span>
+                    </div>
+                    <div class="ind-switch active" onclick="toggleSwitch(this)">
+                        <div class="ind-handle"></div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Logout Button -->
+        <section class="pt-8 pb-12">
+            <button onclick="handleLogout()" class="w-full bg-black dark:bg-white text-white dark:text-black py-6 text-sm font-black tracking-[0.3em] uppercase hover:opacity-80 transition-all active:scale-95 shadow-xl">
+                TERMINATE SESSION
+            </button>
+            <p class="text-center text-[9px] text-outline font-black uppercase tracking-[0.4em] mt-10">
+                v2.4.5-STABLE_X © CALSEVA NETWORKS 2025
+            </p>
+        </section>
+    </main>
+
+
+    <script>
+        // --- State Management ---
+        let isEditMode = false;
+
+        function toggleEditMode() {
+            isEditMode = !isEditMode;
+            const view = document.getElementById('info-view');
+            const form = document.getElementById('info-form');
+            const btn = document.getElementById('edit-btn');
+
+            if (isEditMode) {
+                document.getElementById('input-name').value = document.getElementById('val-name').innerText;
+                document.getElementById('input-email').value = document.getElementById('val-email').innerText;
+                document.getElementById('input-phone').value = document.getElementById('val-phone').innerText;
+                document.getElementById('input-dept').value = document.getElementById('val-dept').innerText;
+                
+                view.classList.add('hidden');
+                form.classList.remove('hidden');
+                btn.innerText = 'Cancel';
+            } else {
+                view.classList.remove('hidden');
+                form.classList.add('hidden');
+                btn.innerText = 'Edit';
+            }
+        }
+
+        function saveProfile() {
+            document.getElementById('val-name').innerText = document.getElementById('input-name').value;
+            document.getElementById('val-email').innerText = document.getElementById('input-email').value;
+            document.getElementById('val-phone').innerText = document.getElementById('input-phone').value;
+            document.getElementById('val-dept').innerText = document.getElementById('input-dept').value;
+            
+            document.getElementById('display-name').innerText = document.getElementById('input-name').value;
+            document.getElementById('display-email').innerText = document.getElementById('input-email').value;
+
+            const saveBtn = document.querySelector('#info-form button');
+            saveBtn.innerText = "SYNCHRONIZING...";
+            setTimeout(() => {
+                saveBtn.innerText = "Synchronize Changes";
+                toggleEditMode();
+            }, 800);
+        }
+
+        function toggleSwitch(el, isDarkMode = false) {
+            el.classList.toggle('active');
+            if (isDarkMode) {
+                document.documentElement.classList.toggle('dark');
+            }
+        }
+
+        function previewImage(event) {
+            const reader = new FileReader();
+            reader.onload = function() {
+                const output = document.getElementById('profileImage');
+                output.src = reader.result;
+            }
+            reader.readAsDataURL(event.target.files[0]);
+        }
+
+        function handleLogout() {
+            if(confirm("Confirm security termination protocol?")) {
+                window.location.reload();
+            }
+        }
+    </script>
+</body>
+</html>

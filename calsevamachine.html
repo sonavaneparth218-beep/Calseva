@@ -1,0 +1,567 @@
+<!DOCTYPE html>
+<html class="light" lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" name="viewport">
+    <title>CALSEVA | Asset QR Terminal</title>
+    
+    <!-- Fonts & Icons -->
+    <link href="https://fonts.googleapis.com/css2?family=League+Spartan:wght@700;800;900&family=Montserrat:wght@400;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" />
+    
+    <!-- Scripts -->
+    <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+
+    <script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        primary: "#000000",
+                        surface: "#fcfcfc",
+                        accent: "#3b3b3b",
+                        border: "#e5e7eb",
+                        error: "#ba1a1a"
+                    },
+                    fontFamily: {
+                        headline: ["League Spartan", "sans-serif"],
+                        body: ["Montserrat", "sans-serif"]
+                    }
+                }
+            }
+        }
+    </script>
+
+    <style>
+        .material-symbols-outlined { font-variation-settings: 'FILL' 0, 'wght' 300, 'GRAD' 0, 'opsz' 24; }
+        .view-hidden { display: none; }
+        .active-tab { border-bottom: 3px solid black; color: black; font-weight: 900; }
+        input:focus { border-color: black !important; ring: 0 !important; outline: none !important; }
+        * { border-radius: 0px !important; }
+        
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+        .animate-fade { animation: fadeIn 0.4s cubic-bezier(0.16, 1, 0.3, 1) forwards; }
+        
+        .qr-frame { 
+            padding: 12px; 
+            background: white; 
+            border: 1px solid #000;
+            box-shadow: 10px 10px 0px rgba(0,0,0,0.05);
+        }
+
+        .card-selected {
+            border-color: #000 !important;
+            background-color: #f8fafc !important;
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+        }
+
+        /* Custom Checkbox */
+        .cb-container input:checked ~ .checkmark { background-color: black; }
+        .cb-container input:checked ~ .checkmark:after { display: block; }
+
+        /* Mobile specific adjustments */
+        @media (max-width: 640px) {
+            .qr-frame img, .qr-frame canvas { width: 140px !important; height: 140px !important; }
+            h2 { font-size: 2.5rem !important; }
+        }
+
+        button, a { touch-action: manipulation; }
+    </style>
+</head>
+<body class="bg-surface font-body text-black antialiased overflow-x-hidden">
+
+    <!-- Header -->
+    <header class="fixed top-0 w-full z-50 bg-white/90 backdrop-blur-lg border-b border-stone-200 flex justify-between items-center px-4 md:px-6 h-16">
+        <div class="flex items-center gap-1">
+            <a href="Dashboard.html" class="hover:bg-zinc-200 transition-colors active:scale-95 duration-150 p-2 rounded-full flex items-center justify-center">
+                <span class="material-symbols-outlined text-black">arrow_back</span>
+            </a>
+            <h1 class="font-headline text-xl font-black tracking-tighter uppercase ml-1">CALSEVA</h1>
+        </div>
+        <nav class="flex gap-4 h-full">
+            <button onclick="switchView('register')" id="nav-register" class="text-[10px] uppercase tracking-widest font-black text-stone-400 h-full border-b-2 border-transparent transition-all active-tab">Register</button>
+            <button onclick="switchView('vault')" id="nav-vault" class="text-[10px] uppercase tracking-widest font-black text-stone-400 h-full border-b-2 border-transparent transition-all">Vault</button>
+        </nav>
+    </header>
+
+    <!-- REGISTER VIEW -->
+    <main id="view-register" class="pt-24 pb-32 px-6 max-w-4xl mx-auto animate-fade">
+        <header class="mb-10">
+            <span class="text-[9px] font-black uppercase tracking-[0.4em] text-stone-400 mb-2 block">Protocol // Matrix Gen</span>
+            <h2 class="font-headline text-5xl font-black uppercase tracking-tighter leading-none italic">Machine<div>Registration</div></h2>
+        </header>
+
+        <div class="grid grid-cols-1 lg:grid-cols-12 gap-12">
+            <!-- Form Inputs -->
+            <div class="lg:col-span-7 space-y-8">
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div class="space-y-1">
+                        <label class="text-[10px] font-black uppercase tracking-widest text-stone-500">Machine Designation</label>
+                        <input id="machineName" type="text" class="w-full bg-stone-100 border-none border-b-2 border-transparent focus:border-black py-4 px-4 font-bold text-sm" placeholder="e.g. CNC LATHE 01">
+                    </div>
+                    <div class="space-y-1">
+                        <label class="text-[10px] font-black uppercase tracking-widest text-stone-500">Asset ID</label>
+                        <input id="machineId" type="text" class="w-full bg-stone-100 border-none border-b-2 border-transparent focus:border-black py-4 px-4 font-mono text-sm" placeholder="CS-ID-XXXX">
+                    </div>
+                </div>
+
+                <div class="space-y-1">
+                    <label class="text-[10px] font-black uppercase tracking-widest text-black">Asset Machine Link (QR Target)</label>
+                    <div class="flex">
+                        <div class="bg-black text-white p-4 flex items-center justify-center">
+                            <span class="material-symbols-outlined text-sm">link</span>
+                        </div>
+                        <input id="machineLink" type="url" oninput="generatePreviewQR()" class="w-full bg-stone-100 border-none border-b-2 border-black p-4 font-bold text-sm text-blue-600 underline" placeholder="https://calseva.tech/docs/asset-01">
+                    </div>
+                    <p class="text-[9px] text-stone-400 font-bold uppercase mt-2 italic">This link will be encoded into the physical QR label.</p>
+                </div>
+
+                <div class="space-y-1">
+                    <label class="text-[10px] font-black uppercase tracking-widest text-stone-500">Installation Site</label>
+                    <input id="location" type="text" class="w-full bg-stone-100 border-none py-4 px-4 text-sm font-medium" placeholder="Floor 2, Zone B">
+                </div>
+
+                <button onclick="saveMachine()" class="w-full bg-black text-white py-6 text-sm font-black uppercase tracking-[0.3em] shadow-2xl active:scale-[0.98] transition-all flex items-center justify-center gap-3">
+                    <span class="material-symbols-outlined text-sm">database</span> COMMIT TO VAULT
+                </button>
+            </div>
+
+            <!-- QR Preview -->
+            <div class="lg:col-span-5 flex flex-col items-center">
+                <div class="w-full aspect-square border-2 border-dashed border-stone-200 flex flex-col items-center justify-center p-8 bg-white relative">
+                    <div id="qr-preview" class="qr-frame"></div>
+                    <div id="qr-empty" class="text-center opacity-10">
+                        <span class="material-symbols-outlined text-8xl">qr_code_scanner</span>
+                        <p class="text-[10px] uppercase font-black tracking-widest mt-4">Awaiting Data Link</p>
+                    </div>
+                </div>
+                <div class="mt-6 flex flex-col items-center gap-2">
+                    <span class="text-[9px] font-black uppercase tracking-widest text-stone-400">Live Scannable Preview</span>
+                    <button onclick="printInstantLabel()" class="text-[10px] font-black underline uppercase tracking-widest hover:text-blue-600 transition-colors">Test Print PDF</button>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- VAULT VIEW -->
+    <main id="view-vault" class="pt-24 pb-32 px-6 max-w-5xl mx-auto view-hidden animate-fade">
+        <div class="flex flex-col md:flex-row items-start md:items-end justify-between mb-6 border-b-4 border-black pb-6 gap-4">
+            <div>
+                <h2 class="font-headline text-4xl font-black uppercase tracking-tighter">Machine_Vault</h2>
+                <p class="text-[10px] font-bold text-stone-400 uppercase tracking-widest mt-1">Local Storage: <span id="vault-count">0</span> / 300 Capacity</p>
+            </div>
+            <div class="flex flex-wrap gap-2 w-full md:w-auto">
+                <button onclick="exportCSV()" class="flex-1 md:flex-none text-[9px] font-black uppercase tracking-widest bg-stone-100 border border-stone-200 px-4 py-3 hover:bg-black hover:text-white transition-all">Export CSV</button>
+                <button onclick="clearAllRecords()" class="flex-1 md:flex-none text-[9px] font-black uppercase tracking-widest text-red-600 border border-red-100 px-4 py-3 hover:bg-red-600 hover:text-white transition-all">Wipe Vault</button>
+            </div>
+        </div>
+
+        <!-- Bulk Action Header -->
+        <div id="bulk-actions" class="mb-6 flex flex-col sm:flex-row items-center justify-between bg-zinc-900 text-white p-4 gap-4 view-hidden sticky top-20 z-40">
+            <div class="flex items-center gap-4">
+                <label class="flex items-center gap-2 cursor-pointer">
+                    <input type="checkbox" id="select-all" onchange="toggleSelectAll(this)" class="w-4 h-4 rounded-none bg-zinc-800 border-zinc-700 checked:bg-white text-black focus:ring-0">
+                    <span class="text-[10px] font-black uppercase tracking-widest">Select All</span>
+                </label>
+                <span class="text-[10px] font-black uppercase tracking-[0.2em] border-l border-zinc-700 pl-4">
+                    <span id="selected-count">0</span> Assets Selected
+                </span>
+            </div>
+            <div class="flex gap-2 w-full sm:w-auto">
+                <button onclick="printSelected()" class="flex-1 sm:flex-none bg-white text-black text-[9px] font-black uppercase tracking-widest px-6 py-2 hover:bg-stone-200 transition-all flex items-center justify-center gap-2">
+                    <span class="material-symbols-outlined text-sm">print</span> Print Batch
+                </button>
+                <button onclick="deleteSelected()" class="flex-1 sm:flex-none bg-red-600 text-white text-[9px] font-black uppercase tracking-widest px-6 py-2 hover:bg-red-700 transition-all flex items-center justify-center gap-2">
+                    <span class="material-symbols-outlined text-sm">delete</span> Delete
+                </button>
+            </div>
+        </div>
+
+        <div id="vault-grid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            <!-- Cards Injected Here -->
+        </div>
+
+        <div id="vault-empty" class="py-32 text-center view-hidden">
+            <span class="material-symbols-outlined text-6xl text-stone-100">inventory_2</span>
+            <p class="text-stone-300 uppercase font-black text-[11px] tracking-widest mt-4">Database Offline // No Records</p>
+        </div>
+    </main>
+
+    <!-- Toast Notification -->
+    <div id="toast" class="fixed bottom-20 left-1/2 -translate-x-1/2 bg-black text-white px-8 py-4 text-[10px] font-black uppercase tracking-widest shadow-2xl opacity-0 pointer-events-none transition-all z-[100] whitespace-nowrap">
+        SYSTEM SYNCHRONIZED
+    </div>
+
+    <!-- Mobile Nav -->
+    <nav class="md:hidden fixed bottom-0 left-0 w-full flex justify-around items-stretch bg-white border-t-2 border-black z-50 h-16 shadow-2xl">
+        <button onclick="switchView('register')" class="flex-1 flex flex-col items-center justify-center active:bg-slate-50">
+            <span class="material-symbols-outlined mb-1">add_circle</span>
+            <span class="text-[8px] font-black uppercase tracking-widest">Register</span>
+        </button>
+        <button onclick="switchView('vault')" class="flex-1 flex flex-col items-center justify-center active:bg-slate-50 border-l border-stone-100">
+            <span class="material-symbols-outlined mb-1">database</span>
+            <span class="text-[8px] font-black uppercase tracking-widest">Vault</span>
+        </button>
+    </nav>
+
+    <script>
+        const VAULT_LIMIT = 300;
+        let records = JSON.parse(localStorage.getItem('calseva_asset_vault') || '[]');
+        let selectedIndices = new Set();
+
+        // --- View Controller ---
+        function switchView(view) {
+            document.getElementById('view-register').classList.toggle('view-hidden', view !== 'register');
+            document.getElementById('view-vault').classList.toggle('view-hidden', view !== 'vault');
+            document.getElementById('nav-register').classList.toggle('active-tab', view === 'register');
+            document.getElementById('nav-vault').classList.toggle('active-tab', view === 'vault');
+            if (view === 'vault') {
+                selectedIndices.clear();
+                renderVault();
+            }
+            window.scrollTo(0, 0);
+        }
+
+        // --- QR Engine ---
+        function generatePreviewQR() {
+            const link = document.getElementById('machineLink').value;
+            const container = document.getElementById('qr-preview');
+            const emptyState = document.getElementById('qr-empty');
+
+            if (!link || link.trim() === "") {
+                container.innerHTML = "";
+                emptyState.classList.remove('view-hidden');
+                return;
+            }
+
+            emptyState.classList.add('view-hidden');
+            container.innerHTML = "";
+            new QRCode(container, {
+                text: link,
+                width: 180,
+                height: 180,
+                colorDark: "#000000",
+                colorLight: "#ffffff",
+                correctLevel: QRCode.CorrectLevel.H
+            });
+        }
+
+        // --- Record Management ---
+        function saveMachine() {
+            const name = document.getElementById('machineName').value;
+            const id = document.getElementById('machineId').value;
+            const link = document.getElementById('machineLink').value;
+            const loc = document.getElementById('location').value;
+
+            if (!name || !id || !link) {
+                showToast("Name, ID, and Asset Link Required", true);
+                return;
+            }
+
+            if (records.length >= VAULT_LIMIT) {
+                showToast("Vault Capacity (300) Reached", true);
+                return;
+            }
+
+            const newAsset = {
+                id: id.toUpperCase(),
+                name: name.toUpperCase(),
+                link: link,
+                location: loc || "UNASSIGNED",
+                timestamp: new Date().toLocaleString()
+            };
+
+            records.unshift(newAsset);
+            localStorage.setItem('calseva_asset_vault', JSON.stringify(records));
+            
+            showToast("Asset Successfully Logged");
+            resetForm();
+            switchView('vault');
+        }
+
+        function renderVault() {
+            const grid = document.getElementById('vault-grid');
+            const empty = document.getElementById('vault-empty');
+            const countDisplay = document.getElementById('vault-count');
+            const bulkHeader = document.getElementById('bulk-actions');
+            
+            if(countDisplay) countDisplay.innerText = records.length;
+
+            if (records.length === 0) {
+                grid.innerHTML = "";
+                empty.classList.remove('view-hidden');
+                bulkHeader.classList.add('view-hidden');
+                return;
+            }
+
+            empty.classList.add('view-hidden');
+            bulkHeader.classList.remove('view-hidden');
+            
+            grid.innerHTML = records.map((asset, index) => {
+                const isSelected = selectedIndices.has(index);
+                return `
+                    <div id="card-${index}" class="bg-white border-2 border-stone-100 p-6 flex flex-col gap-4 animate-fade shadow-sm hover:shadow-xl transition-all relative group ${isSelected ? 'card-selected' : ''}">
+                        <div class="absolute top-4 left-4">
+                             <input type="checkbox" onchange="toggleItemSelection(${index})" ${isSelected ? 'checked' : ''} 
+                                class="w-4 h-4 cursor-pointer rounded-none border-stone-300 focus:ring-0 text-black">
+                        </div>
+                        <div class="flex justify-between items-start pl-8">
+                            <div class="bg-black text-white text-[8px] font-black px-2 py-0.5 uppercase tracking-widest">
+                                ${asset.id}
+                            </div>
+                            <div class="flex gap-2">
+                                <button onclick="printAssetLabel(${index})" class="text-stone-400 hover:text-black transition-colors">
+                                    <span class="material-symbols-outlined text-sm">print</span>
+                                </button>
+                                <button onclick="deleteRecord(${index})" class="text-stone-300 hover:text-red-600 transition-colors">
+                                    <span class="material-symbols-outlined text-sm">delete</span>
+                                </button>
+                            </div>
+                        </div>
+                        <div>
+                            <h4 class="font-headline font-black text-xl uppercase tracking-tighter leading-tight">${asset.name}</h4>
+                            <p class="text-[9px] font-bold text-stone-400 uppercase tracking-widest mt-1">${asset.location}</p>
+                        </div>
+                        <div class="mt-2 pt-4 border-t border-stone-100 flex items-center justify-between">
+                            <a href="${asset.link}" target="_blank" class="text-[9px] font-black uppercase text-blue-600 underline truncate max-w-[150px]">Open Link</a>
+                            <span class="text-[8px] text-stone-300 font-bold">${asset.timestamp.split(',')[0]}</span>
+                        </div>
+                    </div>
+                `;
+            }).join('');
+            
+            updateSelectionUI();
+        }
+
+        // --- Selection Logic ---
+        function toggleItemSelection(index) {
+            if (selectedIndices.has(index)) {
+                selectedIndices.delete(index);
+            } else {
+                selectedIndices.add(index);
+            }
+            renderVault();
+        }
+
+        function toggleSelectAll(cb) {
+            if (cb.checked) {
+                records.forEach((_, i) => selectedIndices.add(i));
+            } else {
+                selectedIndices.clear();
+            }
+            renderVault();
+        }
+
+        function updateSelectionUI() {
+            const count = selectedIndices.size;
+            document.getElementById('selected-count').innerText = count;
+            document.getElementById('select-all').checked = count === records.length && records.length > 0;
+        }
+
+        function deleteSelected() {
+            if (selectedIndices.size === 0) return;
+            if (confirm(`Delete ${selectedIndices.size} selected records permanently?`)) {
+                records = records.filter((_, i) => !selectedIndices.has(i));
+                selectedIndices.clear();
+                localStorage.setItem('calseva_asset_vault', JSON.stringify(records));
+                renderVault();
+                showToast("Selection Removed");
+            }
+        }
+
+        function deleteRecord(index) {
+            if (confirm("Permanently wipe this asset record from vault?")) {
+                records.splice(index, 1);
+                selectedIndices.delete(index); // Ensure selection is cleaned if active
+                localStorage.setItem('calseva_asset_vault', JSON.stringify(records));
+                renderVault();
+            }
+        }
+
+        function clearAllRecords() {
+            if (confirm("URGENT: Clear entire 300-slot vault? This cannot be undone.")) {
+                records = [];
+                selectedIndices.clear();
+                localStorage.removeItem('calseva_asset_vault');
+                renderVault();
+            }
+        }
+
+        function resetForm() {
+            document.getElementById('machineName').value = "";
+            document.getElementById('machineId').value = "";
+            document.getElementById('machineLink').value = "";
+            document.getElementById('location').value = "";
+            document.getElementById('qr-preview').innerHTML = "";
+            document.getElementById('qr-empty').classList.remove('view-hidden');
+        }
+
+        // --- PDF Generation ---
+        function printAssetLabel(index) {
+            const asset = records[index];
+            generatePDF(asset.name, asset.id, asset.link);
+        }
+
+        function printInstantLabel() {
+            const name = document.getElementById('machineName').value;
+            const id = document.getElementById('machineId').value;
+            const link = document.getElementById('machineLink').value;
+            if (!link) { showToast("Link required for QR", true); return; }
+            generatePDF(name || "TEST ASSET", id || "TEMP-ID", link);
+        }
+
+        async function printSelected() {
+            if (selectedIndices.size === 0) {
+                showToast("Select at least 1 asset", true);
+                return;
+            }
+
+            const selectedAssets = records.filter((_, i) => selectedIndices.has(i));
+            showToast(`Generating ${selectedAssets.length} Labels...`);
+            
+            const { jsPDF } = window.jspdf;
+            const doc = new jsPDF({ orientation: 'l', unit: 'mm', format: [90, 50] });
+
+            const tempDiv = document.createElement('div');
+            tempDiv.style.position = 'absolute';
+            tempDiv.style.left = '-9999px';
+            document.body.appendChild(tempDiv);
+
+            // Sequential generation to handle QR rendering reliably
+            for (let i = 0; i < selectedAssets.length; i++) {
+                if (i > 0) doc.addPage([90, 50], 'l');
+                const asset = selectedAssets[i];
+                
+                tempDiv.innerHTML = "";
+                new QRCode(tempDiv, { text: asset.link, width: 300, height: 300, correctLevel: QRCode.CorrectLevel.H });
+                
+                // Small pause for generation
+                await new Promise(r => setTimeout(r, 150));
+                
+                const img = tempDiv.querySelector('img');
+                const canvas = tempDiv.querySelector('canvas');
+                const qrImgData = (img && img.src && img.src.startsWith('data:image')) ? img.src : canvas.toDataURL('image/png');
+
+                drawLabelPage(doc, asset.name, asset.id, qrImgData);
+            }
+
+            doc.save(`CALSEVA_Batch_${Date.now()}.pdf`);
+            document.body.removeChild(tempDiv);
+            showToast("Batch Ready for Print");
+        }
+
+        // Helper to draw the standard layout onto a jsPDF doc (Optimized for White Sheet)
+        function drawLabelPage(doc, name, id, qrImgData) {
+            // Cut lines (Light Grey) - Helps user cut standard 90x50 labels from standard paper
+            doc.setDrawColor(220, 220, 220);
+            doc.setLineWidth(0.1);
+            doc.rect(0, 0, 90, 50);
+
+            // Header Section
+            doc.setTextColor(0, 0, 0); // Black text for ink saving
+            doc.setFontSize(14);
+            doc.setFont("helvetica", "bold");
+            doc.text("CALSEVA ASSET MATRIX", 5, 8);
+            
+            // Decorative line under header
+            doc.setDrawColor(0, 0, 0);
+            doc.setLineWidth(1);
+            doc.line(5, 11, 85, 11);
+
+            // Asset Information
+            doc.setFontSize(8);
+            doc.setTextColor(100, 100, 100);
+            doc.text("ASSET DESIGNATION:", 5, 18);
+            doc.setTextColor(0, 0, 0);
+            doc.setFontSize(12);
+            doc.text(name.toUpperCase(), 5, 23);
+
+            doc.setFontSize(8);
+            doc.setTextColor(100, 100, 100);
+            doc.text("UNIQUE ID:", 5, 33);
+            doc.setTextColor(0, 0, 0);
+            doc.setFontSize(12);
+            doc.text(id.toUpperCase(), 5, 38);
+
+            // QR Code Section
+            // Draw a thin border box for the QR area
+            doc.setDrawColor(230, 230, 230);
+            doc.setLineWidth(0.2);
+            doc.rect(57.5, 13.5, 29, 29);
+            doc.addImage(qrImgData, 'PNG', 58, 14, 28, 28);
+            
+            // Bottom Instruction
+            doc.setDrawColor(0, 0, 0);
+            doc.setLineWidth(0.3);
+            doc.line(5, 42, 55, 42);
+
+            doc.setFontSize(6);
+            doc.setFont("helvetica", "normal");
+            doc.setTextColor(100, 100, 100);
+            doc.text("SCAN QR FOR DIGITAL SPECIFICATIONS", 5, 46);
+        }
+
+        function generatePDF(name, id, link) {
+            const { jsPDF } = window.jspdf;
+            const doc = new jsPDF({ orientation: 'l', unit: 'mm', format: [90, 50] });
+
+            const tempDiv = document.createElement('div');
+            tempDiv.style.position = 'absolute';
+            tempDiv.style.left = '-9999px';
+            document.body.appendChild(tempDiv);
+            
+            new QRCode(tempDiv, { text: link, width: 300, height: 300, correctLevel: QRCode.CorrectLevel.H });
+            
+            setTimeout(() => {
+                const img = tempDiv.querySelector('img');
+                const canvas = tempDiv.querySelector('canvas');
+                const qrImgData = (img && img.src && img.src.startsWith('data:image')) ? img.src : canvas.toDataURL('image/png');
+
+                if (!qrImgData) {
+                    showToast("Error generating QR", true);
+                    document.body.removeChild(tempDiv);
+                    return;
+                }
+
+                drawLabelPage(doc, name, id, qrImgData);
+                doc.save(`Label_${id}.pdf`);
+                document.body.removeChild(tempDiv);
+            }, 250);
+        }
+
+        function showToast(msg, isError = false) {
+            const t = document.getElementById('toast');
+            t.innerText = msg;
+            t.style.background = isError ? "#ba1a1a" : "#000000";
+            t.style.opacity = '1';
+            t.style.bottom = '40px';
+            setTimeout(() => {
+                t.style.opacity = '0';
+                t.style.bottom = '20px';
+            }, 3000);
+        }
+
+        function exportCSV() {
+            let csv = "Timestamp,Asset ID,Name,Location,Link\n";
+            records.forEach(r => {
+                csv += `${r.timestamp},"${r.id}","${r.name}","${r.location}","${r.link}"\n`;
+            });
+            const blob = new Blob([csv], { type: 'text/csv' });
+            const url = window.URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.setAttribute('href', url);
+            a.setAttribute('download', 'calseva_vault_export.csv');
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+        }
+
+        window.onload = () => {
+            switchView('register');
+        };
+    </script>
+</body>
+</html>
